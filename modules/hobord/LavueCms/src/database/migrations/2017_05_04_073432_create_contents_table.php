@@ -15,14 +15,14 @@ class CreateContentsTable extends Migration
     {
         Schema::create('contents', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('type')->default('page');
+            $table->unsignedInteger('type_id');
             $table->string('status')->default('draft');
             $table->string('primary_locale')->nullable();
             $table->timestamps();
         });
 
         Schema::table('contents', function (Blueprint $table) {
-            $table->index('type');
+            $table->foreign('type_id')->references('id')->on('content_types')->onDelete('cascade');
             $table->index('status');
         });
     }
