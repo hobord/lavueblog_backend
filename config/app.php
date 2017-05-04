@@ -180,7 +180,6 @@ return [
         //CMS
         Dimsav\Translatable\TranslatableServiceProvider::class,
         LavueCms\LavueCmsServiceProvider::class,
-        LavueCms\LavueCmsRouteServiceProvider::class,
 
     ],
 

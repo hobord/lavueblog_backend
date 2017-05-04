@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateContentsTable extends Migration
+class CreateContentTypesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,11 @@ class CreateContentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('contents', function (Blueprint $table) {
+        Schema::create('content_types', function (Blueprint $table) {
             $table->increments('id');
             $table->string('type')->default('page');
-            $table->string('status')->default('draft');
-            $table->string('primary_locale')->nullable();
+            $table->json('settings');
             $table->timestamps();
-        });
-
-        Schema::table('contents', function (Blueprint $table) {
-            $table->index('type');
-            $table->index('status');
         });
     }
 
@@ -34,6 +28,6 @@ class CreateContentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('contents');
+        Schema::dropIfExists('content_types');
     }
 }
