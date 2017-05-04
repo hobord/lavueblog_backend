@@ -19,17 +19,18 @@ class CreateContentsTranslationsTable extends Migration
             $table->string('locale');
             $table->boolean('primary_locale');
 
+            $table->string('slug');
             $table->string('title');
             $table->json('document');
+            $table->json('metatags');
 
-            $table->string('status');
+            $table->string('translation_status');
             $table->unsignedInteger('edited_by');
-            $table->timestamps();
         });
         Schema::table('contents_translations', function (Blueprint $table) {
             $table->index('locale');
             $table->index('content_id');
-            $table->index('status');
+            $table->index('translation_status');
             $table->unique(['content_id', 'locale']);
 
             $table->foreign('content_id')->references('id')->on('contents')->onDelete('cascade');

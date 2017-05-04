@@ -21,7 +21,6 @@ class CreateContentsTable extends Migration
         });
         Schema::table('contents', function (Blueprint $table) {
             $table->index('type');
-            $table->index('edited_by');
             $table->index('status');
         });
     }

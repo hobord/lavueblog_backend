@@ -17,14 +17,13 @@ class LavueCmsServiceProvider extends ServiceProvider
 
     public function boot(\Illuminate\Contracts\Http\Kernel $kernel)
     {
-        $this->publishes([__DIR__ . '/database/migrations' => database_path('migrations')]
-            , 'migrations');
+        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+        $this->loadViewsFrom(__DIR__.'/views', 'lavuecms');
 
-        $this->register();
-    }
+        $this->publishes([
+            __DIR__.'/resources/assets' => resource_path('assets/hobord/lavuecms'),
+        ]);
 
-    public function register()
-    {
         $this->registerCommands();
     }
 
