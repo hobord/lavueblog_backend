@@ -27,7 +27,7 @@ trait TaxomyTermTrait
         }
     }
 
-    public function getTaxonomyTerms()
+    public function taxonomy_terms()
     {
         return $this->morphToMany(TaxonomyTerm::class, 'taxonomy_termable');
     }

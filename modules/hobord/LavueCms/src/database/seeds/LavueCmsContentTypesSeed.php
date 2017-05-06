@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-use LavueCms\ContentType;
+use Hobord\LavueCms\ContentType;
 
 class LavueCmsContentTypesSeed extends Seeder
 {
