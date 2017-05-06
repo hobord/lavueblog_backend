@@ -176,15 +176,23 @@ class ContentController
         $content = Content::where('id', $id)->firstOrFail();
         $medias = $content->loadMedia('images');
         foreach ($medias as $media) {
-//            $media->getUrl();
+            $media->url = $media->getUrl();
         }
         return $medias;
     }
+
     public function add_media(Request $request, $id, $collection='images')
     {
         $content = Content::where('id', $id)->firstOrFail();
-        $content->addMedia($request->file)
+        if($request->get('file_name')) {
+            $content->addMedia($request->file)
+            ->usingFileName($request->get('file_name'))
             ->toMediaLibrary($collection);
+        }
+        else {
+            $content->addMedia($request->file)
+                ->toMediaLibrary($collection);
+        }
     }
 
     public function delete_media(Request $request, $id, $mediaId)
