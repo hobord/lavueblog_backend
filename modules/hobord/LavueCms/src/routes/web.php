@@ -39,6 +39,7 @@ Route::group(['prefix'=>'admin'], function (){
             Route::post('/{content}',  'ContentController@updateOrCreate')->name('api/content/update');
             Route::get('/{id}/delete',  'ContentController@delete')->name('api/content/delete');
 
+            // Translation
             Route::group(['prefix'=>'translation'], function (){
                 Route::get('/',  'ContentTranslationController@ls')->name('api/content_trans/list');
                 Route::get('/{id}',  'ContentTranslationController@get')->name('api/content_trans/get');
@@ -46,10 +47,16 @@ Route::group(['prefix'=>'admin'], function (){
                 Route::get('/{id}/delete',  'ContentTranslationController@delete')->name('api/content_trans/delete');
             });
 
+            // Terms
             Route::get('/{id}/terms', 'ContentController@terms')->name('api/content/terms');
             Route::post('/{id}/terms', 'ContentController@update_terms')->name('api/content/update_terms');
             Route::get('/{id}/add_term/{term_id}', 'ContentController@add_term')->name('api/content/add_term');
             Route::get('/{id}/remove_term/{term_id}', 'ContentController@remove_term')->name('api/content/remove_term');
+
+            //Media
+            Route::get('/{id}/media/{collection?}', 'ContentController@ls_media')->name('api/content/medias');
+            Route::post('/{id}/media/{collection?}', 'ContentController@add_media')->name('api/content/add_media');
+            Route::get('/{id}/media/delete/{mediaId}', 'ContentController@delete_media')->name('api/content/delete_media');
         });
     });
 });

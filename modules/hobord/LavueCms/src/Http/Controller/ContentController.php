@@ -6,6 +6,7 @@ use Hobord\LavueCms\Content;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Spatie\MediaLibrary\Media;
 
 class ContentController
 {
@@ -60,6 +61,8 @@ class ContentController
         return $query;
     }
 
+
+    // Content API
     public function ls(Request $request)
     {
         \App::getLocale();
@@ -76,8 +79,7 @@ class ContentController
         }
         else {
             $key = 'contents_page_' . $request->get('page') . '_' . $per_page;
-            Cache::remember($key ,  env('CACHE_LIVETIME', 60), function () use($request, $per_page) {
-//                $result = Content::withTranslation()->with('taxonomy_terms');
+            $result = Cache::remember($key ,  env('CACHE_LIVETIME', 60), function () use($request, $per_page) {
                 $result = $this->filter_by_term($request);
                 $result = $this->make_filter($request, $result);
                 $result = $this->make_order($request, $result);
@@ -95,14 +97,21 @@ class ContentController
         $model = null;
 
         if(Auth::check() || $request->get('nocache')) {
-            $model = Content::withTranslation()->with('taxonomy_terms')->where('id', $id)->firstOrFail();
+            $model = Content::withTranslation()
+                ->with('taxonomy_terms')
+                ->with('media')
+                ->where('id', $id)
+                ->firstOrFail();
         }
         else {
-            Cache::remember('content_'.$id, env('CACHE_LIVETIME', 60), function () use ($id) {
-                $model = Content::withTranslation()->with('taxonomy_terms')->where('id', $id)->firstOrFail();
+            $model = Cache::remember('content_'.$id, env('CACHE_LIVETIME', 60), function () use ($id) {
+                return Content::withTranslation()
+                    ->with('taxonomy_terms')
+                    ->with('media')
+                    ->where('id', $id)
+                    ->firstOrFail();
             });
         }
-
         return $model;
     }
 
@@ -118,9 +127,8 @@ class ContentController
 
     public function delete(Request $request, $id)
     {
-        Content::destroy($id);
+        return Content::destroy($id);
     }
-
 
     // Taxonomy
     public function terms(Request $request, $id)
@@ -162,5 +170,27 @@ class ContentController
         return $content->taxonomy_terms;
     }
 
+    // Media
+    public function ls_media(Request $request, $id, $collection='images')
+    {
+        $content = Content::where('id', $id)->firstOrFail();
+        $medias = $content->loadMedia('images');
+        foreach ($medias as $media) {
+//            $media->getUrl();
+        }
+        return $medias;
+    }
+    public function add_media(Request $request, $id, $collection='images')
+    {
+        $content = Content::where('id', $id)->firstOrFail();
+        $content->addMedia($request->file)
+            ->toMediaLibrary($collection);
+    }
+
+    public function delete_media(Request $request, $id, $mediaId)
+    {
+        Media::find($mediaId)
+            ->delete();
+    }
 
 }

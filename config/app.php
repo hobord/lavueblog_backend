@@ -179,6 +179,8 @@ return [
 
         //CMS
         Dimsav\Translatable\TranslatableServiceProvider::class,
+        Spatie\MediaLibrary\MediaLibraryServiceProvider::class,
+
         Hobord\Taxonomy\TaxonomyServiceProvider::class,
         Hobord\LavueCms\LavueCmsServiceProvider::class,
 

@@ -3,15 +3,19 @@
 namespace Hobord\LavueCms;
 
 use Illuminate\Database\Eloquent\Model;
-use \Dimsav\Translatable\Translatable;
+use Dimsav\Translatable\Translatable;
+use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
+use Spatie\MediaLibrary\HasMedia\Interfaces\HasMedia;
+use Spatie\MediaLibrary\HasMedia\Interfaces\HasMediaConversions;
+
 use Hobord\Taxonomy\TaxomyTermTrait;
 
-use Hobord\LavueCms\ContentTranslation;
 
-class Content extends Model
+class Content extends Model implements HasMedia
 {
     use Translatable;
     use TaxomyTermTrait;
+    use HasMediaTrait;
 
     public $translationModel = ContentTranslation::class;
 
@@ -28,6 +32,4 @@ class Content extends Model
     protected $fillable = [
         'type_id'
     ];
-
-
 }
