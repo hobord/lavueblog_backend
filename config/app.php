@@ -179,7 +179,8 @@ return [
 
         //CMS
         Dimsav\Translatable\TranslatableServiceProvider::class,
-        LavueCms\LavueCmsServiceProvider::class,
+        Hobord\Taxonomy\TaxonomyServiceProvider::class,
+        Hobord\LavueCms\LavueCmsServiceProvider::class,
 
     ],
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace LavueCms\Http\Controller;
+namespace Hobord\LavueCms\Http\Controller;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use LavueCms\ContentTranslation;
 use Illuminate\Support\Facades\Cache;
+use Hobord\LavueCms\ContentTranslation;
 
 class ContentTranslationController
 {

@@ -1,15 +1,17 @@
 <?php
 
-namespace LavueCms;
+namespace Hobord\LavueCms;
 
 use Illuminate\Database\Eloquent\Model;
 use \Dimsav\Translatable\Translatable;
+use Hobord\Taxonomy\TaxomyTermTrait;
 
-use LavueCms\ContentTranslation;
+use Hobord\LavueCms\ContentTranslation;
 
 class Content extends Model
 {
     use Translatable;
+    use TaxomyTermTrait;
 
     public $translationModel = ContentTranslation::class;
 
@@ -24,7 +26,7 @@ class Content extends Model
     ];
 
     protected $fillable = [
-        'type'
+        'type_id'
     ];
 
 

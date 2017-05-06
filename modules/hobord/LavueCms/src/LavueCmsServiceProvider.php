@@ -1,5 +1,5 @@
 <?php
-namespace LavueCms;
+namespace Hobord\LavueCms;
 
 use Illuminate\Routing\Router;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
@@ -18,7 +18,7 @@ class LavueCmsServiceProvider extends ServiceProvider
      *
      * @var string|null
      */
-    protected $namespace = 'LavueCms\Http\Controller';
+    protected $namespace = 'Hobord\LavueCms\Http\Controller';
 
     /**
      * Bootstrap any application services.

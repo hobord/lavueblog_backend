@@ -1,8 +1,8 @@
 <?php
 
-namespace LavueCms\Http\Controller;
+namespace Hobord\LavueCms\Http\Controller;
 
-use LavueCms\Content;
+use Hobord\LavueCms\Content;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;

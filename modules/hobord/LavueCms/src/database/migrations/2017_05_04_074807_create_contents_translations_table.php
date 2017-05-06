@@ -18,13 +18,13 @@ class CreateContentsTranslationsTable extends Migration
             $table->unsignedInteger('content_id');
             $table->string('locale');
 
-            $table->string('slug');
+            $table->string('slug')->nullable();
             $table->string('title');
             $table->json('metatags')->nullable();
-            $table->json('document');
+            $table->json('document')->nullable();
             $table->json('properties')->nullable();
 
-            $table->string('translation_status');
+            $table->string('translation_status')->nullable();
             $table->unsignedInteger('edited_by')->nullable();
         });
         Schema::table('contents_translations', function (Blueprint $table) {

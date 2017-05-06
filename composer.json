@@ -21,7 +21,8 @@
         ],
         "psr-4": {
             "App\\": "app/",
-            "LavueCms\\": "modules/hobord/LavueCms/src"
+            "Hobord\\LavueCms\\": "modules/hobord/LavueCms/src",
+            "Hobord\\Taxonomy\\": "modules/hobord/Taxonomy/src"
         }
     },
     "autoload-dev": {
