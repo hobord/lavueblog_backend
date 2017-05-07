@@ -13,15 +13,34 @@ class LavueCmsContentTypesSeed extends Seeder
      */
     public function run()
     {
-        ContentType::updateOrCreate(['type' => 'Page'], [
-            'type' => 'Page',
+        ContentType::updateOrCreate(['type' => 'Layout'], [
+            'type' => 'Layout',
             'config' => [
+                'properties'=>[
+                    'blocks'=>[
 
+                    ]
+                ]
             ]
         ]);
 
-        ContentType::updateOrCreate(['type' => 'PagePart'], [
-            'type' => 'PagePart',
+        ContentType::updateOrCreate(['type' => 'Page'], [
+            'type' => 'Page',
+            'config' => [
+                'form_settings' => [
+
+                ],
+                'properties'=>[
+                    'layout'=>'default',
+                    'blocks'=>[
+
+                    ]
+                ]
+            ]
+        ]);
+
+        ContentType::updateOrCreate(['type' => 'Block'], [
+            'type' => 'Block',
             'config' => []
         ]);
 
