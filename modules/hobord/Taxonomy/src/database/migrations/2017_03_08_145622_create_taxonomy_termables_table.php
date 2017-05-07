@@ -20,7 +20,7 @@ class CreateTaxonomyTermablesTable extends Migration
             $table->string('taxonomy_termable_type');
             $table->timestamps();
         });
-        Schema::table('taxonomy_termable', function (Blueprint $table) {
+        Schema::table('taxonomy_termables', function (Blueprint $table) {
             $table->unique(['taxonomy_term_id', 'taxonomy_termable_type', 'taxonomy_termable_id'], 'termable_unique');
             $table->foreign('taxonomy_term_id')->references('id')->on('taxonomy_terms')->onDelete('cascade');
         });
@@ -33,6 +33,6 @@ class CreateTaxonomyTermablesTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::dropIfExists('taxonomy_termables');
     }
 }
