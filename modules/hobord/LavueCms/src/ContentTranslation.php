@@ -3,7 +3,6 @@
 namespace Hobord\LavueCms;
 
 use Illuminate\Database\Eloquent\Model;
-use \Dimsav\Translatable\Translatable;
 
 class ContentTranslation extends Model
 {
@@ -16,14 +15,15 @@ class ContentTranslation extends Model
         'title',
         'metatags',
         'document',
+        'properties',
         'translation_status',
-        'edited_by',
-        'primary_locale'
+        'edited_by'
     ];
 
     protected $casts = [
+        'metatags' => 'array',
         'document' => 'array',
-        'metatags' => 'array'
+        'properties' => 'array'
     ];
 
     public function content()

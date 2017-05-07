@@ -25,6 +25,7 @@ class Content extends Model implements HasMedia, HasTaxonomyTerms
         'title',
         'metatags',
         'document',
+        'properties',
         'translation_status',
         'edited_by',
         'primary_locale'
