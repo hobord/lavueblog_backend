@@ -11,6 +11,12 @@ use Spatie\MediaLibrary\Media;
 class ContentController
 {
 
+    /**
+     * Generate term_filter if is 'term_filter' in request exists
+     *
+     * @param $request
+     * @return mixed
+     */
     private function filter_by_term($request)
     {
         if($request->get('term_filter')) {
@@ -24,33 +30,49 @@ class ContentController
         return $result;
     }
 
+    /**
+     * Generate filter if 'filters' array is exists in the requests
+     *
+     * @param $request
+     * @param $query
+     * @return mixed
+     */
     private function make_filter($request, $query) {
         if($request->get('filters')) {
             $filters = $request->get('filters');
-            foreach ($filters as $key => $filter) {
-                if($key != 'type_id'
-                    && $key != 'status'
-                    && $key != 'primary_locale'
-                    && $key != 'created_at'
-                    && $key != 'updated_at'
-                ) {
-                    if ($filter['comp'] == 'like')
-                        $query = $query->whereTranslationLike($key, "%".$filter['value']."%");
-                    elseif ($filter['comp'] == '=')
-                        $query = $query->whereTranslation($key, $filter['value']);
-                    elseif ($filter['comp'] == '!=')
-                        $query = $query->whereTranslation($key, '!=', "%".$filter['value']."%");
+            if(is_array($filters)) {
+                foreach ($filters as $key => $filter) {
+                    if($key != 'type_id'
+                        && $key != 'status'
+                        && $key != 'primary_locale'
+                        && $key != 'created_at'
+                        && $key != 'updated_at'
+                    ) {
+                        if ($filter['comp'] == 'like')
+                            $query = $query->whereTranslationLike($key, "%".$filter['value']."%");
+                        elseif ($filter['comp'] == '=')
+                            $query = $query->whereTranslation($key, $filter['value']);
+                        elseif ($filter['comp'] == '!=')
+                            $query = $query->whereTranslation($key, '!=', "%".$filter['value']."%");
 //                        elseif ($filter['comp'] == 'notLike')
 //                            $query = $query->whereTranslation($key, "%".$filter['value']."%");
-                }
-                else {
-                    $query = $query->where($key, $filter['comp'], $filter['value']);
+                    }
+                    else {
+                        $query = $query->where($key, $filter['comp'], $filter['value']);
+                    }
                 }
             }
         }
         return $query;
     }
 
+    /**
+     * Make order into the query by  'order_by' and 'order_direction' request parameters
+     *
+     * @param $request
+     * @param $query
+     * @return mixed
+     */
     private function make_order($request, $query)
     {
         if($request->get('order_by')) {
@@ -63,6 +85,18 @@ class ContentController
 
 
     // Content API
+
+    /**
+     * List Contents
+     * You can filtering by taxonomy terms -> 'term_filter'
+     * You can search/filtering by fields  -> 'filters'
+     * You can ordering the results with 'order_by' and 'order_direction'  request parameters
+     * The result is paginated by default 15 item/page
+     * You can disable the cache by 'nocache' request parameter (authenticated users has disabled)
+     *
+     * @param Request $request
+     * @return array|mixed
+     */
     public function ls(Request $request)
     {
         \App::getLocale();
@@ -91,6 +125,14 @@ class ContentController
         return $result;
     }
 
+    /**
+     * Get the Content by id
+     * You can disable the cache by 'nocache' request parameter (authenticated users has disabled)
+     *
+     * @param Request $request
+     * @param $id
+     * @return null
+     */
     public function get(Request $request, $id)
     {
         \App::getLocale();
@@ -115,6 +157,12 @@ class ContentController
         return $model;
     }
 
+    /**
+     * Update or create a Content
+     *
+     * @param Request $request
+     * @return mixed
+     */
     public function updateOrCreate(Request $request)
     {
         \App::getLocale();
@@ -125,18 +173,42 @@ class ContentController
         return $content;
     }
 
+    /**
+     * Delete Content
+     *
+     * @param Request $request
+     * @param $id
+     * @return int
+     */
     public function delete(Request $request, $id)
     {
         return Content::destroy($id);
     }
 
     // Taxonomy
+
+    /**
+     * List of Content's ($id) TaxonomyTerms
+     *
+     * @param Request $request
+     * @param $id
+     * @return mixed
+     */
     public function terms(Request $request, $id)
     {
         $content = Content::where('id', $id)->firstOrFail();
         return $content->taxonomy_terms;
     }
 
+    /**
+     * Add Content ($id) to TaxonomyTerm ($term_id)
+     * return List of Content's TaxonomyTerms
+     *
+     * @param Request $request
+     * @param $id
+     * @param $term_id
+     * @return mixed
+     */
     public function add_term(Request $request, $id, $term_id)
     {
         $content = Content::where('id', $id)->firstOrFail();
@@ -144,6 +216,15 @@ class ContentController
         return $content->taxonomy_terms;
     }
 
+    /**
+     * Remove Content ($id) from TaxonomyTerm ($term_id)
+     * return List of Content's TaxonomyTerms
+     *
+     * @param Request $request
+     * @param $id
+     * @param $term_id
+     * @return mixed
+     */
     public function remove_term(Request $request, $id, $term_id)
     {
         $content = Content::where('id', $id)->firstOrFail();
@@ -151,26 +232,46 @@ class ContentController
         return $content->taxonomy_terms;
     }
 
+    /**
+     * Add and remove (update) Content ($id) TaxonomyTerms by 'terms_ids' request array parameter
+     *
+     * @param Request $request
+     * @param $id
+     * @return mixed
+     */
     public function update_terms(Request $request, $id)
     {
         $content = Content::where('id', $id)->firstOrFail();
         $terms_ids = $request->get('terms_ids');
 
-        foreach ($content->taxonomy_terms as $term) {
-            if(!in_array($term->id, $terms_ids)) {
-                $content->removeFromTaxonomyTerm($term->id);
+        if($terms_ids && is_array($terms_ids)) {
+            foreach ($content->taxonomy_terms as $term) {
+                if(!in_array($term->id, $terms_ids)) {
+                    $content->removeFromTaxonomyTerm($term->id);
+                }
+                if (($key = array_search($term->id, $terms_ids)) !== false) {
+                    unset($terms_ids[$key]);
+                }
             }
-            if (($key = array_search($term->id, $terms_ids)) !== false) {
-                unset($terms_ids[$key]);
+            foreach ($terms_ids as $term_id) {
+                $content->addToTaxonomyTerm($term_id);
             }
         }
-        foreach ($terms_ids as $term_id) {
-            $content->addToTaxonomyTerm($term_id);
-        }
+
         return $content->taxonomy_terms;
     }
 
     // Media
+
+    /**
+     * List Content ($id) urls of media collection (default collection is 'images')
+     * The result array key is the media object id
+     *
+     * @param Request $request
+     * @param $id
+     * @param string $collection
+     * @return mixed
+     */
     public function ls_media(Request $request, $id, $collection='images')
     {
         $conversionName = ($request->get('conversion')) ? $request->get('conversion') : '';
@@ -185,7 +286,16 @@ class ContentController
         return $urls;
     }
 
-    public function get_media(Request $request, $id, $mediaId)
+    /**
+     * Get media by $mediaId
+     * You can set optionally the conversion version of url by 'conversion' request parameter
+     *
+     * @param Request $request
+     * @param $id
+     * @param $mediaId
+     * @return mixed
+     */
+    public function get_media(Request $request, $id=null, $mediaId)
     {
         $conversionName = ($request->get('conversion')) ? $request->get('conversion') : '';
         $media = Media::where('id', $mediaId)->firstOrFail();
@@ -193,21 +303,36 @@ class ContentController
         return $media;
     }
 
+    /**
+     * Upload file to Content ($id) media library into the ($collection='images').
+     *
+     * @param Request $request
+     * @param $id
+     * @param string $collection
+     */
     public function add_media(Request $request, $id, $collection='images')
     {
         $content = Content::where('id', $id)->firstOrFail();
         if($request->get('file_name')) {
-            $content->addMedia($request->file)
+            return $content->addMedia($request->file)
             ->usingFileName($request->get('file_name'))
             ->toMediaLibrary($collection);
         }
         else {
-            $content->addMedia($request->file)
+            return $content->addMedia($request->file)
                 ->toMediaLibrary($collection);
         }
     }
 
-    public function delete_media(Request $request, $id, $mediaId)
+    /**
+     * Delete media by $mediaId
+     *
+     * @param Request $request
+     * @param $id
+     * @param $mediaId
+     * @return mixed
+     */
+    public function delete_media(Request $request, $id=null, $mediaId)
     {
         $media = Media::where('id', $mediaId)->firstOrFail();
         return $media->delete();
