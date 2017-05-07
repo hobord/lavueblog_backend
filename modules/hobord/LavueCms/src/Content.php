@@ -8,10 +8,11 @@ use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
 use Spatie\MediaLibrary\HasMedia\Interfaces\HasMedia;
 use Spatie\MediaLibrary\HasMedia\Interfaces\HasMediaConversions;
 
+use Hobord\Taxonomy\Interfaces\HasTaxonomyTerms;
 use Hobord\Taxonomy\TaxomyTermTrait;
 
 
-class Content extends Model implements HasMedia
+class Content extends Model implements HasMedia, HasTaxonomyTerms
 {
     use Translatable;
     use TaxomyTermTrait;
