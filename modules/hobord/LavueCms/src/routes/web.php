@@ -54,9 +54,10 @@ Route::group(['prefix'=>'admin'], function (){
             Route::get('/{id}/remove_term/{term_id}', 'ContentController@remove_term')->name('api/content/remove_term');
 
             //Media
-            Route::get('/{id}/media/{collection?}', 'ContentController@ls_media')->name('api/content/medias');
-            Route::post('/{id}/media/{collection?}', 'ContentController@add_media')->name('api/content/add_media');
+            Route::get('/{id}/medias/{collection?}', 'ContentController@ls_media')->name('api/content/medias');
+            Route::post('/{id}/medias/{collection?}', 'ContentController@add_media')->name('api/content/add_media');
             Route::get('/{id}/media/delete/{mediaId}', 'ContentController@delete_media')->name('api/content/delete_media');
+            Route::get('/{id}/media/{mediaId}', 'ContentController@get_media')->name('api/content/get_media');
         });
     });
 });

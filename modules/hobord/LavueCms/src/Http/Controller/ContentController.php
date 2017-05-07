@@ -173,12 +173,24 @@ class ContentController
     // Media
     public function ls_media(Request $request, $id, $collection='images')
     {
+        $conversionName = ($request->get('conversion')) ? $request->get('conversion') : '';
         $content = Content::where('id', $id)->firstOrFail();
-        $medias = $content->loadMedia('images');
-        foreach ($medias as $media) {
-            $media->url = $media->getUrl();
-        }
-        return $medias;
+
+        $urls = $content->getMedia($collection)
+            ->keyBy('id')
+            ->transform(function (\Spatie\MediaLibrary\Media $media) use ($conversionName) {
+            return $media->getUrl($conversionName);
+        });
+
+        return $urls;
+    }
+
+    public function get_media(Request $request, $id, $mediaId)
+    {
+        $conversionName = ($request->get('conversion')) ? $request->get('conversion') : '';
+        $media = Media::where('id', $mediaId)->firstOrFail();
+        $media->url = $media->getUrl($conversionName);
+        return $media;
     }
 
     public function add_media(Request $request, $id, $collection='images')
@@ -197,8 +209,8 @@ class ContentController
 
     public function delete_media(Request $request, $id, $mediaId)
     {
-        Media::find($mediaId)
-            ->delete();
+        $media = Media::where('id', $mediaId)->firstOrFail();
+        return $media->delete();
     }
 
 }
