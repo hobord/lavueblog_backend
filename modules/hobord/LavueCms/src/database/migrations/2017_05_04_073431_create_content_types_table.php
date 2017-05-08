@@ -15,12 +15,12 @@ class CreateContentTypesTable extends Migration
     {
         Schema::create('content_types', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('type');
+            $table->string('name');
             $table->json('config')->nullable();
             $table->timestamps();
         });
         Schema::table('content_types', function (Blueprint $table) {
-            $table->unique('type');
+            $table->unique('name');
         });
     }
 

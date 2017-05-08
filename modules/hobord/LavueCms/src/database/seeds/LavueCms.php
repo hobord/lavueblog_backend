@@ -24,11 +24,20 @@ class LavueCms extends Seeder
             'config' => []
         ]);
         $typePost = ContentType::updateOrCreate(['type' => 'Post'], [
-            'type' => 'Post',
-            'config' => []
+            'name' => 'Post',
+            'config' => [
+                'indexes' => [
+                    [
+                        'index_name' => 'index_votes',
+                        'type' => 'integer',
+                        'field' => 'fields->"$.five_star.votes"'
+                    ]
+                ]
+            ]
         ]);
 
         $taxonomy = Hobord\Taxonomy\Taxonomy::create(['name'=>'Catalog']);
+
         $term1 = Hobord\Taxonomy\TaxonomyTerm::create([
             'taxonomy_id' => $taxonomy->id,
             'name' => 'term1'
@@ -106,6 +115,9 @@ class LavueCms extends Seeder
             ]
         ]);
         $post2->addToTaxonomyTerm([$term1->id, $term3->id]);
+
+        $typePost->addJsonIndex('fields->"$.five_star.votes"', 'integer', 'index_votes');
+//        $typePost->deleteJsonIndex('index_votes');
 
         /*
          http://.../admin/api/content?nocache=1&filters[document->body->plain][comp]=like&filters[document->body->plain][value]=second
