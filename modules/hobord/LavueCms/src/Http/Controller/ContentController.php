@@ -3,6 +3,7 @@
 namespace Hobord\LavueCms\Http\Controller;
 
 use Hobord\LavueCms\Content;
+use Hobord\LavueCms\ContentTranslation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -42,23 +43,39 @@ class ContentController
             $filters = $request->get('filters');
             if(is_array($filters)) {
                 foreach ($filters as $key => $filter) {
+                    switch ($filter['comp']){
+                        case 'like':
+                            $comp = 'like';
+                            $filter['value'] = "%".$filter['value']."%";
+                            break;
+                        case 'eq':
+                            $comp = '=';
+                            break;
+                        case 'not_eq':
+                            $comp = '!=';
+                            break;
+                        case 'gt':
+                            $comp = '>';
+                            break;
+                        case 'lt':
+                            $comp = '<';
+                            break;
+                        default:
+                            $comp = '=';
+                    }
+
                     if($key != 'type_id'
                         && $key != 'status'
                         && $key != 'primary_locale'
                         && $key != 'created_at'
                         && $key != 'updated_at'
                     ) {
-                        if ($filter['comp'] == 'like')
-                            $query = $query->whereTranslationLike($key, "%".$filter['value']."%");
-                        elseif ($filter['comp'] == '=')
-                            $query = $query->whereTranslation($key, $filter['value']);
-                        elseif ($filter['comp'] == '!=')
-                            $query = $query->whereTranslation($key, '!=', "%".$filter['value']."%");
-//                        elseif ($filter['comp'] == 'notLike')
-//                            $query = $query->whereTranslation($key, "%".$filter['value']."%");
+                        if(is_numeric($filter['value']))
+                            $filter['value'] =(float) $filter['value'];
+                        $query = $query->whereCompTranslation($key, $filter['value'], $comp);
                     }
                     else {
-                        $query = $query->where($key, $filter['comp'], $filter['value']);
+                        $query = $query->where($key, $comp, $filter['value']);
                     }
                 }
             }

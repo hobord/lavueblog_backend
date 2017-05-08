@@ -106,5 +106,11 @@ class LavueCms extends Seeder
             ]
         ]);
         $post2->addToTaxonomyTerm([$term1->id, $term3->id]);
+
+        /*
+         http://.../admin/api/content?nocache=1&filters[document->body->plain][comp]=like&filters[document->body->plain][value]=second
+
+http://192.168.99.100:94/admin/api/content?nocache=1&filters[fields-%3Efive_star-%3Evotes][comp]=eq&filters[fields-%3Efive_star-%3Evotes][value]=0
+         */
     }
 }

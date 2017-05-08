@@ -2,6 +2,7 @@
 
 namespace Hobord\LavueCms;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Dimsav\Translatable\Translatable;
 use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
@@ -34,6 +35,29 @@ class Content extends Model implements HasMedia, HasTaxonomyTerms
     protected $fillable = [
         'type_id'
     ];
+
+    /**
+     * This scope filters results by checking the translation fields.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string                                $key
+     * @param string                                $value
+     * @param string                                $comp
+     * @param string                                $locale
+     *
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+
+    public function scopeWhereCompTranslation(Builder $query, $key, $value, $comp='=', $locale = null)
+    {
+        return $query->whereHas('translations', function (Builder $query) use ($key, $comp, $value, $locale) {
+            $query->where($this->getTranslationsTable().'.'.$key, $comp, $value);
+            if ($locale) {
+                $query->where($this->getTranslationsTable().'.'.$this->getLocaleKey(), $locale);
+            }
+        });
+    }
+
 
 //    public function related_contents()
 //    {
