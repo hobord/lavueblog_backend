@@ -13,16 +13,17 @@ class ContentTranslation extends Model
     protected $fillable = [
         'slug',
         'title',
-        'metatags',
-        'document',
-        'properties',
-        'translation_status',
-        'edited_by'
+        'metatags', // Document meta information rendering to header
+        'document', // You can store the leads, plaintext, full document etc
+        'fields', // Other fields what will be rendering on frontend
+        'properties', // Other properties, you can store here de system level properties
+        'edited_by' //last editor id
     ];
 
     protected $casts = [
         'metatags' => 'array',
         'document' => 'array',
+        'fields' => 'array',
         'properties' => 'array'
     ];
 

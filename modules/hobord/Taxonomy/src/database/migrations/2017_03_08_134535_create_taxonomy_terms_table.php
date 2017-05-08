@@ -20,6 +20,7 @@ class CreateTaxonomyTermsTable extends Migration
             $table->string('name');
             $table->string('locale')->nullable();
             $table->json('properties')->nullable();
+            $table->integer('delta')->nullable();
             $table->timestamps();
         });
         Schema::table('taxonomy_terms', function (Blueprint $table) {

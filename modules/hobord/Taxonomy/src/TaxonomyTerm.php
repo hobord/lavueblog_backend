@@ -17,7 +17,8 @@ class TaxonomyTerm extends Model
         'parent_id',
         'name',
         'locale',
-        'properties'
+        'properties',
+        'delta'
     ];
 
     public function taxonomy()

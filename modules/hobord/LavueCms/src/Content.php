@@ -25,8 +25,8 @@ class Content extends Model implements HasMedia, HasTaxonomyTerms
         'title',
         'metatags',
         'document',
+        'fields',
         'properties',
-        'translation_status',
         'edited_by',
         'primary_locale'
     ];
@@ -34,4 +34,15 @@ class Content extends Model implements HasMedia, HasTaxonomyTerms
     protected $fillable = [
         'type_id'
     ];
+
+//    public function related_contents()
+//    {
+//        return $this->belongsToMany(Content::class, 'contents_related_contents', 'content_id', 'related_content_id');
+//    }
+
+    //TODO
+    public function related_contents()
+    {
+        return $this->morphedByMany(get_class($this), 'content_related_object');
+    }
 }

@@ -20,17 +20,17 @@ class CreateContentsTranslationsTable extends Migration
 
             $table->string('slug')->nullable();
             $table->string('title');
-            $table->json('metatags')->nullable();
-            $table->json('document')->nullable();
-            $table->json('properties')->nullable();
 
-            $table->string('translation_status')->nullable();
+            $table->json('metatags')->nullable(); // Document meta information rendering to header
+            $table->json('document')->nullable(); // You can store the leads, plaintext, full document etc
+            $table->json('fields')->nullable(); // Other fields what will be rendering on forms
+            $table->json('properties')->nullable(); // Other properties, you can store here de system level properties
+
             $table->unsignedInteger('edited_by')->nullable();
         });
         Schema::table('contents_translations', function (Blueprint $table) {
             $table->index('locale');
             $table->index('content_id');
-            $table->index('translation_status');
             $table->unique(['content_id', 'locale']);
 
             $table->foreign('content_id')->references('id')->on('contents')->onDelete('cascade');
