@@ -18,9 +18,29 @@ class ContentType extends Model
         'config'
     ];
 
+    public function __construct(array $attributes = [])
+    {
+        $class_vars = get_class_vars(ContentTranslation::class);
+        $this->translations_table = $class_vars['table'];
+
+        return parent::__construct($attributes);
+    }
+
     public function contents()
     {
         return $this->hasMany(Content::class, 'type_id', 'id');
+    }
+    /**
+     * Save the model to the database.
+     *
+     * @param  array  $options
+     * @return bool
+     */
+    public function save(array $options = [])
+    {
+        $ret = parent::save($options);
+        $this->updateJsonIndexes();
+        return $ret;
     }
 
     public function updateJsonIndexes()
@@ -29,7 +49,7 @@ class ContentType extends Model
         $driver = config("database.connections.{$connection}.driver");
 
         if($driver=='mysql') {
-            $indexes = \DB::select(DB::raw("SHOW KEYS FROM $this->translations_table WHERE Key_name LIKE \"%_jsonfield\" "));
+            $indexes = \DB::select(\DB::raw("SHOW KEYS FROM $this->translations_table WHERE Key_name LIKE \"%_jsonfield\" "));
 
             if(array_key_exists('indexes', $this->config)) {
                 foreach ($this->config['indexes'] as $index) {

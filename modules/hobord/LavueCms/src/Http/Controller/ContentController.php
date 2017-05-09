@@ -21,7 +21,7 @@ class ContentController
     private function filter_by_term($request)
     {
         if($request->get('term_filter')) {
-            $result = Content::whereHas('taxonomy_terms', function($q) use ($request) {
+            $result = Content::withTranslation()->whereHas('taxonomy_terms', function($q) use ($request) {
                 $q->whereIn('taxonomy_term_id', $request->get('term_filter'));
             });
         }

@@ -14,19 +14,23 @@ trait TaxomyTermTrait
         $result = [];
         if(is_array($term_id)) {
             foreach ($term_id as $id){
-                $result[] = TaxonomyTermable::create([
-                    'taxonomy_termable_type' => get_class($this),
-                    'taxonomy_termable_id' => $this->id,
-                    'taxonomy_term_id' => $id
-                ]);
+                try {
+                    $result[] = TaxonomyTermable::create([
+                        'taxonomy_termable_type' => get_class($this),
+                        'taxonomy_termable_id' => $this->id,
+                        'taxonomy_term_id' => $id
+                    ]);
+                } catch (\Exception $e) {}
             }
         }
         else {
-            $result[] = TaxonomyTermable::create([
-                'taxonomy_termable_type' => get_class($this),
-                'taxonomy_termable_id' => $this->id,
-                'taxonomy_term_id' => $term_id
-            ]);
+            try {
+                $result[] = TaxonomyTermable::create([
+                    'taxonomy_termable_type' => get_class($this),
+                    'taxonomy_termable_id' => $this->id,
+                    'taxonomy_term_id' => $term_id
+                ]);
+            } catch (\Exception $e) {}
         }
 
         return $result;
@@ -40,23 +44,27 @@ trait TaxomyTermTrait
         $result = [];
         if(is_array($term_id)) {
             foreach ($term_id as $id) {
-                $node = TaxonomyTermable::where([
-                    'taxonomy_termable_type' => get_class($this),
-                    'taxonomy_termable_id' => $this->id,
-                    'taxonomy_term_id' => $id
-                ])->first();
-                $node->destroy();
+                try {
+                    $node = TaxonomyTermable::where([
+                        'taxonomy_termable_type' => get_class($this),
+                        'taxonomy_termable_id' => $this->id,
+                        'taxonomy_term_id' => $id
+                    ])->first();
+                    $node->destroy();
+                } catch (\Exception $e) {}
             }
         }
         else {
-            $node = TaxonomyTermable::where([
-                'taxonomy_termable_type' => get_class($this),
-                'taxonomy_termable_id' => $this->id,
-                'taxonomy_term_id' => $term_id
-            ])->first();
-            if($node) {
-                $node->destroy();
-            }
+            try {
+                $node = TaxonomyTermable::where([
+                    'taxonomy_termable_type' => get_class($this),
+                    'taxonomy_termable_id' => $this->id,
+                    'taxonomy_term_id' => $term_id
+                ])->first();
+                if($node) {
+                    $node->destroy();
+                }
+            } catch (\Exception $e) {}
         }
     }
 

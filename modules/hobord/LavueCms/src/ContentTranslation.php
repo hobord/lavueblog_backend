@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ContentTranslation extends Model
 {
-    protected $table = 'contents_translations';
+    public $table = 'contents_translations';
 
     public $timestamps = false;
 
