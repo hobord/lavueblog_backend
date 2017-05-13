@@ -74,14 +74,19 @@ class ContentController
                         case 'eq':
                             $comp = '=';
                             break;
-                        case 'not_eq':
+                        case 'ne':
                             $comp = '!=';
                             break;
                         case 'gt':
                             $comp = '>';
+                        case 'gte':
+                            $comp = '>=';
                             break;
                         case 'lt':
                             $comp = '<';
+                            break;
+                        case 'lte':
+                            $comp = '<=';
                             break;
                         default:
                             $comp = '=';
@@ -123,6 +128,26 @@ class ContentController
         return $query;
     }
 
+    public function make_cache_key($request)
+    {
+        $key = $this->content_class;
+        if($request->get('term_filter')) {
+            $key .="_t_". implode('_', $request->get('term_filter'));
+        }
+        if($request->get('filters')) {
+            $f = "";
+            foreach ($request->get('filters') as $filter) {
+                $f .= $filter['comp'].$filter['value'];
+            }
+            $key .= "f_".$f;
+        }
+        if($request->get('order_by')) {
+            $key .= $request->get('order_by') . ($request->get('order_direction')) ? $request->get('order_direction') : 'desc';
+        }
+        $key .= "_page_". $request->get('page');
+        $key .= "_per_page_" . ($request->get('per_page')) ? $request->get('per_page'):15;
+        return md5($key);
+    }
 
     // Content API
 
@@ -140,20 +165,22 @@ class ContentController
     public function ls(Request $request)
     {
         \App::getLocale();
-        $per_page = ($request->get('per_page')) ? $request->get('per_page'):15;
+        $per_page = ($request->get('per_page')) ? $request->get('per_page'):25;
 
         $result = [];
+        $key = 'contents_' . $this->make_cache_key($request);
 
-        if (Auth::check() || $request->get('nocache')) {
+        if ($request->get('nocache')) {
 //            $result = Content::withTranslation()->with('taxonomy_terms');
             $result = $this->filter_by_term($request);
             $result = $this->make_filter($request, $result);
             $result = $this->make_order($request, $result);
             $result = $result->paginate($per_page);
+            Cache::put($key, $result, env('CACHE_LIVETIME', 60));
         }
         else {
-            $key = 'contents_page_' . $request->get('page') . '_' . $per_page;
-            $result = Cache::remember($key ,  env('CACHE_LIVETIME', 60), function () use($request, $per_page) {
+
+            $result = Cache::remember($key ,  env('CACHE_LIVETIME', 60), function () use ($request, $per_page) {
                 $result = $this->filter_by_term($request);
                 $result = $this->make_filter($request, $result);
                 $result = $this->make_order($request, $result);
@@ -185,6 +212,7 @@ class ContentController
                 ->with('media')
                 ->where('id', $id)
                 ->firstOrFail();
+            Cache::put('content_'.$id, $model, env('CACHE_LIVETIME', 60));
         }
         else {
             $model = Cache::remember('content_'.$id, env('CACHE_LIVETIME', 60), function () use ($id, $content_class) {
