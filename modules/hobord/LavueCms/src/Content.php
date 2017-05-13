@@ -13,7 +13,7 @@ use Hobord\Taxonomy\Interfaces\HasTaxonomyTerms;
 use Hobord\Taxonomy\TaxomyTermTrait;
 
 
-class Content extends Model implements HasMedia, HasTaxonomyTerms
+class Content extends Model implements HasMedia, HasTaxonomyTerms, HasMediaConversions
 {
     use Translatable;
     use TaxomyTermTrait;
@@ -37,6 +37,24 @@ class Content extends Model implements HasMedia, HasTaxonomyTerms
     ];
 
     /**
+     * Register the conversions that should be performed.
+     *
+     * @return array
+     */
+    public function registerMediaConversions()
+    {
+//        $this->addMediaConversion('thumbnail')
+//            ->width(300)
+//            ->height(200)
+//            ->extractVideoFrameAtSecond(5) // If it's a video; grab the still frame from the 5th second in the video
+//            ->sharpen(10);
+//        $this->addMediaConversion('banner')
+//            ->fit(Manipulations::FIT_CROP, 800, 200)
+//            ->apply()
+//            ->blur(40);
+    }
+
+    /**
      * This scope filters results by checking the translation fields.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
@@ -47,22 +65,15 @@ class Content extends Model implements HasMedia, HasTaxonomyTerms
      *
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-
     public function scopeWhereCompTranslation(Builder $query, $key, $value, $comp='=', $locale = null)
     {
         return $query->whereHas('translations', function (Builder $query) use ($key, $comp, $value, $locale) {
-            $query->where($this->getTranslationsTable().'.'.$key, $comp, $value);
+            $query->where($this->getTranslationsTable() . '.' . $key, $comp, $value);
             if ($locale) {
-                $query->where($this->getTranslationsTable().'.'.$this->getLocaleKey(), $locale);
+                $query->where($this->getTranslationsTable() . '.' . $this->getLocaleKey(), $locale);
             }
         });
     }
-
-
-//    public function related_contents()
-//    {
-//        return $this->belongsToMany(Content::class, 'contents_related_contents', 'content_id', 'related_content_id');
-//    }
 
     //TODO
     public function related_contents()

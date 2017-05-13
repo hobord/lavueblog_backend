@@ -17,11 +17,13 @@ class LavueCms extends Seeder
             'name' => 'Page',
             'config' => [
 
-            ]
+            ],
+            'class_name' => 'Hobord\LavueCms\Content'
         ]);
         $typePagePart = ContentType::updateOrCreate(['name' => 'PagePart'], [
             'name' => 'PagePart',
-            'config' => []
+            'config' => [],
+            'class_name' => 'Hobord\LavueCms\Content'
         ]);
         $typePost = ContentType::updateOrCreate(['name' => 'Post'], [
             'name' => 'Post',
@@ -44,7 +46,8 @@ class LavueCms extends Seeder
                     ],
 
                 ]
-            ]
+            ],
+            'class_name' => 'Hobord\LavueCms\Content'
         ]);
 //        $typePost->addJsonIndex('fields->"$.five_star.votes"', 'integer', 'index_votes');
 //        $typePost->addJsonIndex('properties->"$.published"', 'int(1)', 'index_published');

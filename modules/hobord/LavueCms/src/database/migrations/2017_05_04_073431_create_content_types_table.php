@@ -16,6 +16,7 @@ class CreateContentTypesTable extends Migration
         Schema::create('content_types', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->string('class_name')->default('Hobord\LavueCms\Content');
             $table->json('config')->nullable();
             $table->timestamps();
         });

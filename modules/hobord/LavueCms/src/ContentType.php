@@ -20,15 +20,27 @@ class ContentType extends Model
 
     public function __construct(array $attributes = [])
     {
-        $class_vars = get_class_vars(ContentTranslation::class);
-        $this->translations_table = $class_vars['table'];
+//        $class_vars = get_class_vars(ContentTranslation::class);
+//        $this->translations_table = $class_vars['table'];
 
-        return parent::__construct($attributes);
+        $ret = parent::__construct($attributes);
+
+        $this->update_translation_class();
+
+        return $ret;
     }
 
+    private function update_translation_class()
+    {
+        $class_vars = get_class_vars($this->class_name);
+        $translationModelClass = $class_vars['translationModel'];
+
+        $class_vars = get_class_vars($translationModelClass);
+        $this->translations_table = $class_vars['table'];
+    }
     public function contents()
     {
-        return $this->hasMany(Content::class, 'type_id', 'id');
+        return $this->hasMany($this->class_name, 'type_id', 'id');
     }
     /**
      * Save the model to the database.
@@ -39,6 +51,7 @@ class ContentType extends Model
     public function save(array $options = [])
     {
         $ret = parent::save($options);
+        $this->update_translation_class();
         $this->updateJsonIndexes();
         return $ret;
     }

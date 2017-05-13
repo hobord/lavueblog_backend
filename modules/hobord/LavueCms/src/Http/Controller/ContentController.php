@@ -3,7 +3,8 @@
 namespace Hobord\LavueCms\Http\Controller;
 
 use Hobord\LavueCms\Content;
-use Hobord\LavueCms\ContentTranslation;
+//use Hobord\LavueCms\ContentTranslation;
+use Hobord\LavueCms\ContentType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -11,6 +12,26 @@ use Spatie\MediaLibrary\Media;
 
 class ContentController
 {
+    public $content_class = Content::class;
+
+    public function __construct(Request $request)
+    {
+        $content_type_id =  $request->get('content_type_id');
+        if($content_type_id) {
+            $key = "content_type_" . $content_type_id;
+            if (Auth::check() || $request->get('nocache')) {
+                $content_type = ContentType::find($content_type_id);
+            }
+            else {
+                $content_type = Cache::remember($key, env('CACHE_LIVETIME', 60), function () use ($content_type_id) {
+                    ContentType::find($content_type_id);
+                });
+            }
+            if($content_type) {
+                $this->content_class = $content_type->class_name;
+            }
+        }
+    }
 
     /**
      * Generate term_filter if is 'term_filter' in request exists
@@ -20,13 +41,15 @@ class ContentController
      */
     private function filter_by_term($request)
     {
+        $content_class = $this->content_class;
+
         if($request->get('term_filter')) {
-            $result = Content::withTranslation()->whereHas('taxonomy_terms', function($q) use ($request) {
+            $result = $content_class::withTranslation()->whereHas('taxonomy_terms', function($q) use ($request) {
                 $q->whereIn('taxonomy_term_id', $request->get('term_filter'));
             });
         }
         else {
-            $result = Content::withTranslation()->with('taxonomy_terms');
+            $result = $content_class::withTranslation()->with('taxonomy_terms');
         }
         return $result;
     }
@@ -154,17 +177,18 @@ class ContentController
     {
         \App::getLocale();
         $model = null;
+        $content_class = $this->content_class;
 
         if(Auth::check() || $request->get('nocache')) {
-            $model = Content::withTranslation()
+            $model = $content_class::withTranslation()
                 ->with('taxonomy_terms')
                 ->with('media')
                 ->where('id', $id)
                 ->firstOrFail();
         }
         else {
-            $model = Cache::remember('content_'.$id, env('CACHE_LIVETIME', 60), function () use ($id) {
-                return Content::withTranslation()
+            $model = Cache::remember('content_'.$id, env('CACHE_LIVETIME', 60), function () use ($id, $content_class) {
+                return $content_class::withTranslation()
                     ->with('taxonomy_terms')
                     ->with('media')
                     ->where('id', $id)
@@ -183,7 +207,9 @@ class ContentController
     public function updateOrCreate(Request $request)
     {
         \App::getLocale();
-        $content = Content::updateOrCreate(
+        $content_class = $this->content_class;
+
+        $content = $content_class::updateOrCreate(
             ['id' => $request->get('id')],
             $request->all()
         );
@@ -199,7 +225,9 @@ class ContentController
      */
     public function delete(Request $request, $id)
     {
-        return Content::destroy($id);
+        $content_class = $this->content_class;
+
+        return $content_class::destroy($id);
     }
 
     // Taxonomy
@@ -213,7 +241,9 @@ class ContentController
      */
     public function terms(Request $request, $id)
     {
-        $content = Content::where('id', $id)->firstOrFail();
+        $content_class = $this->content_class;
+
+        $content = $content_class::where('id', $id)->firstOrFail();
         return $content->taxonomy_terms;
     }
 
@@ -228,7 +258,9 @@ class ContentController
      */
     public function add_term(Request $request, $id, $term_id)
     {
-        $content = Content::where('id', $id)->firstOrFail();
+        $content_class = $this->content_class;
+
+        $content = $content_class::where('id', $id)->firstOrFail();
         $content->addToTaxonomyTerm($term_id);
         return $content->taxonomy_terms;
     }
@@ -244,7 +276,9 @@ class ContentController
      */
     public function remove_term(Request $request, $id, $term_id)
     {
-        $content = Content::where('id', $id)->firstOrFail();
+        $content_class = $this->content_class;
+
+        $content = $content_class::where('id', $id)->firstOrFail();
         $content->removeFromTaxonomyTerm($term_id);
         return $content->taxonomy_terms;
     }
@@ -258,7 +292,9 @@ class ContentController
      */
     public function update_terms(Request $request, $id)
     {
-        $content = Content::where('id', $id)->firstOrFail();
+        $content_class = $this->content_class;
+
+        $content = $content_class::where('id', $id)->firstOrFail();
         $terms_ids = $request->get('terms_ids');
 
         if($terms_ids && is_array($terms_ids)) {
@@ -291,8 +327,10 @@ class ContentController
      */
     public function ls_media(Request $request, $id, $collection='images')
     {
+        $content_class = $this->content_class;
+
         $conversionName = ($request->get('conversion')) ? $request->get('conversion') : '';
-        $content = Content::where('id', $id)->firstOrFail();
+        $content = $content_class::where('id', $id)->firstOrFail();
 
         $urls = $content->getMedia($collection)
             ->keyBy('id')
@@ -329,7 +367,9 @@ class ContentController
      */
     public function add_media(Request $request, $id, $collection='images')
     {
-        $content = Content::where('id', $id)->firstOrFail();
+        $content_class = $this->content_class;
+
+        $content = $content_class::where('id', $id)->firstOrFail();
         if($request->get('file_name')) {
             return $content->addMedia($request->file)
             ->usingFileName($request->get('file_name'))
