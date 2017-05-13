@@ -79,6 +79,7 @@ class ContentController
                             break;
                         case 'gt':
                             $comp = '>';
+                            break;
                         case 'gte':
                             $comp = '>=';
                             break;
